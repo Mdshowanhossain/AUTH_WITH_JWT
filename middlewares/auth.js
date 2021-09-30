@@ -5,12 +5,9 @@ module.exports = (req, res, next) => {
     if (!authHeader) {
         res.status(401).send('Unauthorized');
     }
-
     try {
         const decodedToken = jwt.verify(authHeader, process.env.JWT_SECRET);
-
         // console.log(decodedToken);
-
         req.userId = decodedToken.user._id
         next();
 
