@@ -1,16 +1,20 @@
-const checkLogin = (req, res, next) => {
-    const { authorization } = req.headers;
+const jwt = require('jsonwebtoken');
+
+module.exports = (req, res, next) => {
+    const authHeader = req.header('Authorization');
+    if (!authHeader) {
+        res.status(401).send('Unauthorized');
+    }
 
     try {
-        const token = authorization.split(' ')[1];
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const { username, userId } = decoded;
-        req.username = username;
-        req.userId = userId;
-        next();
-    } catch {
-        next('Authentication failed')
-    }
-};
+        const decodedToken = jwt.verify(authHeader, process.env.JWT_SECRET);
 
-module.exports = checkLogin;
+        // console.log(decodedToken);
+
+        req.userId = decodedToken.user._id
+        next();
+
+    } catch (err) {
+        res.status(401).send('Unauthorized');
+    }
+}
